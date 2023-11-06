@@ -7,29 +7,29 @@ Users can choose between RHEL, Fedora and CentOS based builder images.
 The resulting image can be run using [podman](https://github.com/containers/libpod), [Docker](http://docker.io) or using [source-to-image](https://github.com/openshift/source-to-image/).
 Also the whole pipeline from build to app deployment could be run on top of the [Openshift Origin](https://www.okd.io/) or [Red Hat's Openshift](https://www.openshift.com/).
 
+Build
+---------------------
+```
+$ podman build -t quay.io/smileyfritz/golang-builder:1.20.10
+```
 
 Usage
 ---------------------
+Create the imagestreams:
+```
+$ oc replace -f imagestreams/golang-fedora.json
+```
+Create a test application:
+```
+$ oc new-app golang:1.20.10~https://github.com/kondohiroki/go-boilerplate.git
+```
+Verify that the application has started:
+```
+$ oc get builds
+NAME               TYPE     FROM          STATUS     STARTED         DURATION
+go-boilerplate-1   Source   Git@c32c51a   Complete   3 minutes ago   2m6s
+```
 
-Simplest usage via s2i:
-
-s2i build ./src centos/go-toolset-7-centos7:latest test-app
-
-where ./src directory contains git repository with golang application that has complete dependencies. You can't use incremental build in this case.
-
-or
-
-s2i build -e IMPORT_URL='github.com/cpuguy83/go-md2man' ./src centos/go-toolset-7-centos7:latest test-app
-
-where ./src directory contains git repository with golang application(in this case github.com/cpuguy83/go-md2man) that has complete or incomplete dependencies. You can use incremental build in this case.
-
-Both will build test-app application image.
-
-Environment variables
----------------------
-
-To set these environment variables, you can place them as a key value pair into a `.s2i/environment`
-file inside your source code repository or specified via s2i invocation.
 
 
 * **IMPORT_URL**
